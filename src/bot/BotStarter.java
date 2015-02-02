@@ -171,7 +171,7 @@ public class BotStarter implements Bot
     }
 
     private boolean shouldAttack(Region fromRegion, Region toRegion) {
-        return fromRegion.getArmies() > 5 && toRegion.getArmies() < 0.8*(fromRegion.getArmies()-1);
+        return toRegion.getArmies() < 0.8*(fromRegion.getArmies()-1);
     }
 
     private void rebuildRegionLayers(BotState state) {
