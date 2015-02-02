@@ -24,8 +24,9 @@ public class BotParser {
 	final Bot bot;
 	
 	BotState currentState;
-	
-	public BotParser(Bot bot)
+    private ArrayList<PlaceArmiesMove> placeArmiesMoves;
+
+    public BotParser(Bot bot)
 	{
 		this.scan = new Scanner(System.in);
 		this.bot = bot;
@@ -53,13 +54,15 @@ public class BotParser {
 				if(parts[1].equals("place_armies")) 
 				{
 					//place armies
-					ArrayList<PlaceArmiesMove> placeArmiesMoves = bot.getPlaceArmiesMoves(currentState, Long.valueOf(parts[2]));
+					placeArmiesMoves = bot.getPlaceArmiesMoves(currentState, Long.valueOf(parts[2]));
 					for(PlaceArmiesMove move : placeArmiesMoves)
 						output = output.concat(move.getString() + ",");
 
                     // we are updating the state, but that should be fine because it will be overwritten in the next round
                     for(PlaceArmiesMove move : placeArmiesMoves) {
+                        if (move.getRegion().getId() == 10) System.err.println("Placing at "+move.getRegion().getId()+": "+move.getRegion().getArmies()+" -> "+(move.getRegion().getArmies()+move.getArmies()));
                         move.getRegion().setArmies(move.getRegion().getArmies() + move.getArmies());
+                        if (move.getRegion().getId() == 10) System.err.println("Updated region "+move.getRegion().getId()+" armies = "+move.getRegion().getArmies());
                     }
 				} 
 				else if(parts[1].equals("attack/transfer")) 
@@ -73,6 +76,34 @@ public class BotParser {
 					System.out.println(output);
 				else
 					System.out.println("No moves");
+            } else if (parts[0].equals("Output")) {
+                String placement = line.substring(line.indexOf('"')+1, line.lastIndexOf('"'));
+                parts = placement.split(" ");
+                System.err.println(placement);
+                if (parts.length > 1 && parts[1].equals("place_armies")) {
+//                  Output from your bot: "player1 place_armies 7 2,player1 place_armies 7 2,player1 place_armies 9 2,"
+
+                    for(PlaceArmiesMove move : placeArmiesMoves) {
+                        if (move.getRegion().getId() == 10) System.err.println("Replacing at "+move.getRegion()+": "+move.getRegion().getArmies()+" -> "+(move.getRegion().getArmies()-move.getArmies()));
+
+                        move.getRegion().setArmies(move.getRegion().getArmies() - move.getArmies());
+                        if (move.getRegion().getId() == 10) System.err.println("Updated region "+move.getRegion().getId()+" armies = "+move.getRegion().getArmies());
+                    }
+
+                    for(int i=2; i<parts.length; i+=3) {
+                        int region = Integer.parseInt(parts[i]);
+                        int armies = Integer.parseInt(parts[i+1].split(",")[0]);
+//                        System.err.println("Place "+armies+" in "+region);
+
+                        Region region1 = currentState.getVisibleMap().getRegion(region);
+
+                        if (region == 10) System.err.println("Correcting placing at "+region1+": "+region1.getArmies()+" -> "+(region1.getArmies()+armies));
+
+                        region1.setArmies(region1.getArmies()+armies);
+
+                        if (region == 10) System.err.println("Updated region "+region1.getId()+" armies = "+region1.getArmies());
+                    }
+                }
 			} else if(parts[0].equals("settings")) {
 				//update settings
 				currentState.updateSettings(parts[1], parts);

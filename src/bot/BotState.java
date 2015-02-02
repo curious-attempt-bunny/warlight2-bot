@@ -175,6 +175,7 @@ public class BotState {
 				
 				region.setPlayerName(playerName);
 				region.setArmies(armies);
+                System.err.println("Update map for region "+region.getId()+" armies = "+region.getArmies());
 				i += 2;
 			}
 			catch(Exception e) {

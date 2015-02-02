@@ -125,7 +125,7 @@ public class BotStarter implements Bot
                     }
                 });
 
-//                System.err.println("From region "+fromRegion.getId()+" has "+fromRegion.getArmies()+" armies");
+                System.err.println("From region "+fromRegion.getId()+" has "+fromRegion.getArmies()+" armies");
 				while(!possibleToRegions.isEmpty())
 				{
                     Region toRegion = possibleToRegions.get(0);
@@ -136,9 +136,9 @@ public class BotStarter implements Bot
                     }
 //                    System.err.println("Considering "+toRegion.getId()+" which has countNotByOwner of "+toRegion.getSuperRegion().countNotByOwner(myName));
 
-					if(!toRegion.getPlayerName().equals(myName) && fromRegion.getArmies() > 5) //do an attack
+					if(!toRegion.getPlayerName().equals(myName) && shouldAttack(fromRegion, toRegion)) //do an attack
 					{
-						attackTransferMoves.add(new AttackTransferMove(myName, fromRegion, toRegion, armies));
+						attackTransferMoves.add(new AttackTransferMove(myName, fromRegion, toRegion, howManyToAttackWith(fromRegion, toRegion)));
 						break;
 					}
 					else if(toRegion.getPlayerName().equals(myName) && fromRegion.getArmies() > 1
@@ -156,6 +156,14 @@ public class BotStarter implements Bot
 		
 		return attackTransferMoves;
 	}
+
+    private int howManyToAttackWith(Region fromRegion, Region toRegion) {
+        return (int) Math.min(fromRegion.getArmies()-1, toRegion.getArmies()*2);
+    }
+
+    private boolean shouldAttack(Region fromRegion, Region toRegion) {
+        return fromRegion.getArmies() > 5 && toRegion.getArmies() < 0.8*(fromRegion.getArmies()-1);
+    }
 
     private void rebuildRegionLayers(BotState state) {
         LinkedList<Region> layer = new LinkedList<Region>();
