@@ -21,6 +21,7 @@ public class Region {
 	private int armies;
 	private String playerName;
     private boolean border;
+    private int layerNumber;
 
     public Region(int id, SuperRegion superRegion)
 	{
@@ -133,5 +134,13 @@ public class Region {
         }
 //        System.err.println("Region "+getId()+" is not border");
         return false;
+    }
+
+    public void setLayerNumber(int layerNumber) {
+        this.layerNumber = layerNumber;
+    }
+
+    public int getLayerNumber() {
+        return layerNumber;
     }
 }

@@ -90,7 +90,19 @@ public class Map {
 	public LinkedList<Region> getRegions() {
 		return regions;
 	}
-	
+
+    public LinkedList<Region> getRegionsOwnedBy(String playerName) {
+        LinkedList<Region> regions = new LinkedList<Region>();
+
+        for(Region region : this.regions) {
+            if (region.getPlayerName().equals(playerName)) {
+                regions.add(region);
+            }
+        }
+
+        return regions;
+    }
+
 	/**
 	 * @return : the list of all SuperRegions in this map
 	 */

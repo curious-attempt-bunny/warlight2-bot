@@ -44,7 +44,7 @@ public class BotStarter implements Bot
 
         for(Region region : state.getPickableStartingRegions()) {
             int size = region.getSuperRegion().getSubRegions().size();
-            System.err.println("Region "+region.getId()+" belongs to super region "+region.getSuperRegion().getId()+" of size "+region.getSuperRegion().getSubRegions().size());
+//            System.err.println("Region "+region.getId()+" belongs to super region "+region.getSuperRegion().getId()+" of size "+region.getSuperRegion().getSubRegions().size());
             if (bestRegionID == null || size < bestSize) {
                 bestSize = size;
                 bestRegionID = region.getId();
@@ -104,6 +104,8 @@ public class BotStarter implements Bot
 		int maxTransfers = 10;
 		int transfers = 0;
 
+        rebuildRegionLayers(state);
+
 		for(Region fromRegion : state.getVisibleMap().getRegions())
 		{
 			if(fromRegion.ownedByPlayer(myName)) //do an attack
@@ -123,7 +125,7 @@ public class BotStarter implements Bot
                     }
                 });
 
-                System.err.println("From region "+fromRegion.getId()+" has "+fromRegion.getArmies()+" armies");
+//                System.err.println("From region "+fromRegion.getId()+" has "+fromRegion.getArmies()+" armies");
 				while(!possibleToRegions.isEmpty())
 				{
                     Region toRegion = possibleToRegions.get(0);
@@ -132,7 +134,7 @@ public class BotStarter implements Bot
                         possibleToRegions.remove(toRegion);
                         continue;
                     }
-                    System.err.println("Considering "+toRegion.getId()+" which has countNotByOwner of "+toRegion.getSuperRegion().countNotByOwner(myName));
+//                    System.err.println("Considering "+toRegion.getId()+" which has countNotByOwner of "+toRegion.getSuperRegion().countNotByOwner(myName));
 
 					if(!toRegion.getPlayerName().equals(myName) && fromRegion.getArmies() > 5) //do an attack
 					{
@@ -140,7 +142,7 @@ public class BotStarter implements Bot
 						break;
 					}
 					else if(toRegion.getPlayerName().equals(myName) && fromRegion.getArmies() > 1
-								&& transfers < maxTransfers) //do a transfer
+								&& transfers < maxTransfers && toRegion.getLayerNumber() < fromRegion.getLayerNumber()) //do a transfer
 					{
 						attackTransferMoves.add(new AttackTransferMove(myName, fromRegion, toRegion, armies));
 						transfers++;
@@ -155,7 +157,33 @@ public class BotStarter implements Bot
 		return attackTransferMoves;
 	}
 
-	public static void main(String[] args)
+    private void rebuildRegionLayers(BotState state) {
+        LinkedList<Region> layer = new LinkedList<Region>();
+
+        for(Region region : state.getVisibleMap().getRegionsOwnedBy(state.getMyPlayerName())) {
+            if (region.isBorder()) {
+                region.setLayerNumber(1);
+                layer.add(region);
+            } else {
+                region.setLayerNumber(Integer.MAX_VALUE);
+            }
+        }
+
+        while(!layer.isEmpty()) {
+            LinkedList<Region> nextLayer = new LinkedList<Region>();
+            for(Region region : layer) {
+                for(Region neighbour : region.getNeighbors()) {
+                    if (neighbour.getPlayerName().equals(state.getMyPlayerName()) && region.getLayerNumber() < neighbour.getLayerNumber()) {
+                        neighbour.setLayerNumber(region.getLayerNumber()+1);
+                        nextLayer.add(neighbour);
+                    }
+                }
+            }
+            layer = nextLayer;
+        }
+    }
+
+    public static void main(String[] args)
 	{
 		BotParser parser = new BotParser(new BotStarter());
 		parser.run();
