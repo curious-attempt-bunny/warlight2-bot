@@ -56,6 +56,11 @@ public class BotParser {
 					ArrayList<PlaceArmiesMove> placeArmiesMoves = bot.getPlaceArmiesMoves(currentState, Long.valueOf(parts[2]));
 					for(PlaceArmiesMove move : placeArmiesMoves)
 						output = output.concat(move.getString() + ",");
+
+                    // we are updating the state, but that should be fine because it will be overwritten in the next round
+                    for(PlaceArmiesMove move : placeArmiesMoves) {
+                        move.getRegion().setArmies(move.getRegion().getArmies() + move.getArmies());
+                    }
 				} 
 				else if(parts[1].equals("attack/transfer")) 
 				{

@@ -109,12 +109,18 @@ public class BotStarter implements Bot
 				possibleToRegions.addAll(fromRegion.getNeighbors());
 
                 Collections.sort(possibleToRegions, new Comparator<Region>() {
+                    private int score(Region region) {
+                        return (region.getPlayerName().equals(myName) ? 100 : 0) +
+                            region.getSuperRegion().countNotByOwner(myName);
+                    }
+
                     @Override
                     public int compare(Region o1, Region o2) {
-                        return o1.getSuperRegion().countNotByOwner(myName) - o2.getSuperRegion().countNotByOwner(myName);
+                        return score(o1) - score(o2);
                     }
                 });
 
+                System.err.println("From region "+fromRegion.getId()+" has "+fromRegion.getArmies()+" armies");
 				while(!possibleToRegions.isEmpty())
 				{
 					Region toRegion = possibleToRegions.get(0);

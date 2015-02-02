@@ -17,6 +17,10 @@ public class IntegrationTest extends TestCase {
         testCase("AttackToWinSuperRegion.txt");
     }
 
+    public void testAttackToWinSuperRegion2() throws Exception {
+        testCase("AttackToWinSuperRegion2.txt");
+    }
+
     private void testCase(String filename) throws Exception {
         String input = readFileAsString(filename);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -35,7 +39,7 @@ public class IntegrationTest extends TestCase {
         Matcher matcher = Pattern.compile("(?m)^# Valid: (.*)$").matcher(input);
         while (matcher.find()) {
             String expected = matcher.group(1);
-            if (expected.equals(actual)) {
+            if (matches(expected, actual)) {
                 correct = true;
                 break;
             } else {
@@ -48,6 +52,16 @@ public class IntegrationTest extends TestCase {
         if (!correct) {
             assertEquals(information, actual);
         }
+    }
+
+    private boolean matches(String expected, String actual) {
+        if (expected.equals(actual)) {
+            return true;
+        }
+        if (expected.startsWith("[")) {
+            return actual.contains(expected.substring(1, expected.length()-1));
+        }
+        return false;
     }
 
     private String readFileAsString(String filePath) throws IOException {
