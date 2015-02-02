@@ -40,13 +40,22 @@ public class BotStarter implements Bot
 	public Region getStartingRegion(BotState state, Long timeOut)
 	{
 		Integer bestRegionID = null;
-        int bestSize = 0;
+        double bestScore = 0;
 
         for(Region region : state.getPickableStartingRegions()) {
-            int size = region.getSuperRegion().getSubRegions().size();
+            int remaining = 2*(region.getSuperRegion().getSubRegions().size() - 1);
+            for(Region region2 : region.getSuperRegion().getSubRegions()) {
+                for(Region region3 : state.getWasteLands()) {
+                    if (region3.getId() == region2.getId()) {
+                        remaining += 8;
+                    }
+                }
+            }
+            double reward = region.getSuperRegion().getArmiesReward();
+            double score = (remaining == 0 ? reward : reward/remaining);
 //            System.err.println("Region "+region.getId()+" belongs to super region "+region.getSuperRegion().getId()+" of size "+region.getSuperRegion().getSubRegions().size());
-            if (bestRegionID == null || size < bestSize) {
-                bestSize = size;
+            if (bestRegionID == null || score > bestScore) {
+                bestScore = score;
                 bestRegionID = region.getId();
             }
         }
