@@ -20,10 +20,7 @@ package bot;
  * a new instance of your bot, and then the parser is started.
  */
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.Random;
+import java.util.*;
 
 import map.Region;
 import map.SuperRegion;
@@ -99,11 +96,11 @@ public class BotStarter implements Bot
 	public ArrayList<AttackTransferMove> getAttackTransferMoves(BotState state, Long timeOut) 
 	{
 		ArrayList<AttackTransferMove> attackTransferMoves = new ArrayList<AttackTransferMove>();
-		String myName = state.getMyPlayerName();
+		final String myName = state.getMyPlayerName();
 		int armies = 5;
 		int maxTransfers = 10;
 		int transfers = 0;
-		
+
 		for(Region fromRegion : state.getVisibleMap().getRegions())
 		{
 			if(fromRegion.ownedByPlayer(myName)) //do an attack
@@ -111,11 +108,18 @@ public class BotStarter implements Bot
 				ArrayList<Region> possibleToRegions = new ArrayList<Region>();
 				possibleToRegions.addAll(fromRegion.getNeighbors());
 
-                Collections.shuffle(possibleToRegions, random);
+                Collections.sort(possibleToRegions, new Comparator<Region>() {
+                    @Override
+                    public int compare(Region o1, Region o2) {
+                        return o1.getSuperRegion().countNotByOwner(myName) - o2.getSuperRegion().countNotByOwner(myName);
+                    }
+                });
+
 				while(!possibleToRegions.isEmpty())
 				{
 					Region toRegion = possibleToRegions.get(0);
-					
+                    System.err.println("Considering "+toRegion.getId()+" which has countNotByOwner of "+toRegion.getSuperRegion().countNotByOwner(myName));
+
 					if(!toRegion.getPlayerName().equals(myName) && fromRegion.getArmies() > 5) //do an attack
 					{
 						attackTransferMoves.add(new AttackTransferMove(myName, fromRegion, toRegion, armies));

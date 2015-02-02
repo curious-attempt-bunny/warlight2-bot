@@ -64,4 +64,16 @@ public class SuperRegion {
 	public LinkedList<Region> getSubRegions() {
 		return subRegions;
 	}
+
+    public int countNotByOwner(String playerName) {
+        int countNotOwned = 0;
+
+        for(Region region : subRegions) {
+            if (!playerName.equals(region.getPlayerName())) {
+                countNotOwned++;
+            }
+        }
+
+        return countNotOwned;
+    }
 }
