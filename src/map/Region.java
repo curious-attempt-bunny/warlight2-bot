@@ -20,8 +20,9 @@ public class Region {
 	private SuperRegion superRegion;
 	private int armies;
 	private String playerName;
-	
-	public Region(int id, SuperRegion superRegion)
+    private boolean border;
+
+    public Region(int id, SuperRegion superRegion)
 	{
 		this.id = id;
 		this.superRegion = superRegion;
@@ -123,4 +124,14 @@ public class Region {
 			return playerName;
 	}
 
+    public boolean isBorder() {
+        for(Region region : neighbors) {
+            if (!playerName.equals(region.getPlayerName())) {
+//                System.err.println("Region "+getId()+" is border");
+                return true;
+            }
+        }
+//        System.err.println("Region "+getId()+" is not border");
+        return false;
+    }
 }

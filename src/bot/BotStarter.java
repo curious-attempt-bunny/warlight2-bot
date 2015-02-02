@@ -64,12 +64,11 @@ public class BotStarter implements Bot
 	 */
 	public ArrayList<PlaceArmiesMove> getPlaceArmiesMoves(BotState state, Long timeOut) 
 	{
-		
 		ArrayList<PlaceArmiesMove> placeArmiesMoves = new ArrayList<PlaceArmiesMove>();
 		String myName = state.getMyPlayerName();
 		int armies = 2;
 		int armiesLeft = state.getStartingArmies();
-		LinkedList<Region> visibleRegions = state.getVisibleMap().getRegions();
+		LinkedList<Region> visibleRegions = borderRegions(state);
 		
 		while(armiesLeft > 0)
 		{
@@ -87,7 +86,11 @@ public class BotStarter implements Bot
 		return placeArmiesMoves;
 	}
 
-	@Override
+    private LinkedList<Region> borderRegions(BotState state) {
+        return state.getVisibleMap().getBorderRegions();
+    }
+
+    @Override
 	/**
 	 * This method is called for at the second part of each round. This example attacks if a region has
 	 * more than 6 armies on it, and transfers if it has less than 6 and a neighboring owned region.
@@ -123,7 +126,12 @@ public class BotStarter implements Bot
                 System.err.println("From region "+fromRegion.getId()+" has "+fromRegion.getArmies()+" armies");
 				while(!possibleToRegions.isEmpty())
 				{
-					Region toRegion = possibleToRegions.get(0);
+                    Region toRegion = possibleToRegions.get(0);
+
+                    if (fromRegion.getPlayerName().equals(myName) && toRegion.getPlayerName().equals(myName) && fromRegion.isBorder() && !toRegion.isBorder()) {
+                        possibleToRegions.remove(toRegion);
+                        continue;
+                    }
                     System.err.println("Considering "+toRegion.getId()+" which has countNotByOwner of "+toRegion.getSuperRegion().countNotByOwner(myName));
 
 					if(!toRegion.getPlayerName().equals(myName) && fromRegion.getArmies() > 5) //do an attack

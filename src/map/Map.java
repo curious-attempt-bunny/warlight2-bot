@@ -10,6 +10,7 @@
 
 package map;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class Map {
@@ -129,6 +130,15 @@ public class Map {
 			mapString = mapString.concat(region.getId() + ";" + region.getPlayerName() + ";" + region.getArmies() + " ");
 		}
 		return mapString;
-	}	
-	
+	}
+
+    public LinkedList<Region> getBorderRegions() {
+        LinkedList<Region> regions = new LinkedList<Region>();
+        for(Region region : this.regions) {
+            if (region.isBorder()) {
+                regions.add(region);
+            }
+        }
+        return regions;
+    }
 }
