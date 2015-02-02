@@ -38,10 +38,19 @@ public class BotStarter implements Bot
 	 */
 	public Region getStartingRegion(BotState state, Long timeOut)
 	{
-		double rand = Math.random();
-		int r = (int) (rand*state.getPickableStartingRegions().size());
-		int regionId = state.getPickableStartingRegions().get(r).getId();
-		Region startingRegion = state.getFullMap().getRegion(regionId);
+		Integer bestRegionID = null;
+        int bestSize = 0;
+
+        for(Region region : state.getPickableStartingRegions()) {
+            int size = region.getSuperRegion().getSubRegions().size();
+            System.err.println("Region "+region.getId()+" belongs to super region "+region.getSuperRegion().getId()+" of size "+region.getSuperRegion().getSubRegions().size());
+            if (bestRegionID == null || size < bestSize) {
+                bestSize = size;
+                bestRegionID = region.getId();
+            }
+        }
+
+		Region startingRegion = state.getFullMap().getRegion(bestRegionID);
 		
 		return startingRegion;
 	}
