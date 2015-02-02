@@ -1,7 +1,4 @@
-package picking;
-
 import bot.BotStarter;
-import bot.BotState;
 import junit.framework.TestCase;
 
 import java.io.*;
@@ -11,9 +8,17 @@ import java.util.regex.Pattern;
 /**
  * Created by home on 2/1/15.
  */
-public class PIckSmallTest extends TestCase {
-    public void test() throws Exception {
-        String input = readFileAsString("PickSmall.txt");
+public class IntegrationTest extends TestCase {
+    public void testPickSmallStartingSuperRegions() throws Exception {
+        testCase("PickSmall.txt");
+    }
+
+    public void testAttackToWinSuperRegion() throws Exception {
+        testCase("AttackToWinSuperRegion.txt");
+    }
+
+    private void testCase(String filename) throws Exception {
+        String input = readFileAsString(filename);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         System.setIn(new ByteArrayInputStream(input.getBytes()));
@@ -21,8 +26,11 @@ public class PIckSmallTest extends TestCase {
         BotStarter.main(new String[]{});
         String output = new String(out.toByteArray());
 
+
+
         String information = "";
-        String actual  = output.trim();
+        String[] outputCommands = output.split("\n");
+        String actual  = outputCommands[outputCommands.length-1].trim();
         boolean correct = false;
         Matcher matcher = Pattern.compile("(?m)^# Valid: (.*)$").matcher(input);
         while (matcher.find()) {

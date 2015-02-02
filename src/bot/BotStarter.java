@@ -21,7 +21,9 @@ package bot;
  */
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.Random;
 
 import map.Region;
 import map.SuperRegion;
@@ -30,6 +32,8 @@ import move.PlaceArmiesMove;
 
 public class BotStarter implements Bot 
 {
+    private static Random random = new Random(1234);
+
 	@Override
 	/**
 	 * A method that returns which region the bot would like to start on, the pickable regions are stored in the BotState.
@@ -72,7 +76,7 @@ public class BotStarter implements Bot
 		
 		while(armiesLeft > 0)
 		{
-			double rand = Math.random();
+			double rand = random.nextDouble();
 			int r = (int) (rand*visibleRegions.size());
 			Region region = visibleRegions.get(r);
 			
@@ -106,14 +110,13 @@ public class BotStarter implements Bot
 			{
 				ArrayList<Region> possibleToRegions = new ArrayList<Region>();
 				possibleToRegions.addAll(fromRegion.getNeighbors());
-				
+
+                Collections.shuffle(possibleToRegions, random);
 				while(!possibleToRegions.isEmpty())
 				{
-					double rand = Math.random();
-					int r = (int) (rand*possibleToRegions.size());
-					Region toRegion = possibleToRegions.get(r);
+					Region toRegion = possibleToRegions.get(0);
 					
-					if(!toRegion.getPlayerName().equals(myName) && fromRegion.getArmies() > 6) //do an attack
+					if(!toRegion.getPlayerName().equals(myName) && fromRegion.getArmies() > 5) //do an attack
 					{
 						attackTransferMoves.add(new AttackTransferMove(myName, fromRegion, toRegion, armies));
 						break;
