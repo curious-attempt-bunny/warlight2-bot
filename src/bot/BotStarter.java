@@ -162,13 +162,13 @@ public class BotStarter implements Bot
 
 					if(!toRegion.getPlayerName().equals(myName) && shouldAttack(fromRegion, toRegion)) //do an attack
 					{
-						attackTransferMoves.add(new AttackTransferMove(myName, fromRegion, toRegion, howManyToAttackWith(fromRegion, toRegion)));
+						attackTransferMoves.add(new AttackTransferMove(myName, fromRegion, toRegion, howManyToAttackWith(state, fromRegion, toRegion)));
 						break;
 					}
 					else if(toRegion.getPlayerName().equals(myName) && fromRegion.getArmies() > 1
 								&& transfers < maxTransfers && toRegion.getLayerNumber() < fromRegion.getLayerNumber()) //do a transfer
 					{
-						attackTransferMoves.add(new AttackTransferMove(myName, fromRegion, toRegion, armies));
+						attackTransferMoves.add(new AttackTransferMove(myName, fromRegion, toRegion, howManyToMoveWith(state, fromRegion, toRegion)));
 						transfers++;
 						break;
 					}
@@ -181,8 +181,18 @@ public class BotStarter implements Bot
 		return attackTransferMoves;
 	}
 
-    private int howManyToAttackWith(Region fromRegion, Region toRegion) {
-        return (int) Math.min(fromRegion.getArmies()-1, toRegion.getArmies()*2);
+    private int howManyToMoveWith(BotState state, Region fromRegion, Region toRegion) {
+        if (fromRegion.getLayerNumber() > 1 || fromRegion.countByOwner(state.getOpponentPlayerName()) <= 1) {
+            return fromRegion.getArmies()-1;
+        }
+        return ((fromRegion.getArmies()+toRegion.getArmies())/2)-fromRegion.getArmies();
+    }
+
+    private int howManyToAttackWith(BotState state, Region fromRegion, Region toRegion) {
+        if (fromRegion.countByOwner(state.getOpponentPlayerName()) <= 1) {
+            return fromRegion.getArmies()-1;
+        }
+        return (int) Math.min(fromRegion.getArmies() - 1, Math.max(4, toRegion.getArmies() * 2));
     }
 
     private boolean shouldAttack(Region fromRegion, Region toRegion) {

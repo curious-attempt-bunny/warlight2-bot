@@ -152,4 +152,16 @@ public class Region {
         }
         return false;
     }
+
+    public int countByOwner(String playerName) {
+        int count = 0;
+
+        for(Region region : neighbors) {
+            if (region.getPlayerName().equals(playerName)) {
+                count++;
+            }
+        }
+
+        return count;
+    }
 }
