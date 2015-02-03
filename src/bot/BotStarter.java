@@ -43,16 +43,7 @@ public class BotStarter implements Bot
         double bestScore = 0;
 
         for(Region region : state.getPickableStartingRegions()) {
-            int remaining = 2*(region.getSuperRegion().getSubRegions().size() - 1);
-            for(Region region2 : region.getSuperRegion().getSubRegions()) {
-                for(Region region3 : state.getWasteLands()) {
-                    if (region3.getId() == region2.getId()) {
-                        remaining += 8;
-                    }
-                }
-            }
-            double reward = region.getSuperRegion().getArmiesReward();
-            double score = (remaining == 0 ? reward : reward/remaining);
+            double score = region.getSuperRegion().score(state);
 //            System.err.println("Region "+region.getId()+" belongs to super region "+region.getSuperRegion().getId()+" of size "+region.getSuperRegion().getSubRegions().size());
             if (bestRegionID == null || score > bestScore) {
                 bestScore = score;
@@ -71,22 +62,46 @@ public class BotStarter implements Bot
 	 * until he has no more armies left to place.
 	 * @return The list of PlaceArmiesMoves for one round
 	 */
-	public ArrayList<PlaceArmiesMove> getPlaceArmiesMoves(BotState state, Long timeOut) 
+	public ArrayList<PlaceArmiesMove> getPlaceArmiesMoves(final BotState state, Long timeOut)
 	{
 		ArrayList<PlaceArmiesMove> placeArmiesMoves = new ArrayList<PlaceArmiesMove>();
 		String myName = state.getMyPlayerName();
-		int armies = 2;
 		int armiesLeft = state.getStartingArmies();
-		LinkedList<Region> visibleRegions = borderRegions(state);
-		
-		while(armiesLeft > 0)
-		{
-			double rand = random.nextDouble();
-			int r = (int) (rand*visibleRegions.size());
-			Region region = visibleRegions.get(r);
-			
-			if(region.ownedByPlayer(myName))
-			{
+        int armies = armiesLeft;
+        LinkedList<Region> visibleRegions = borderRegions(state);
+
+        Collections.sort(visibleRegions, new Comparator<Region>() {
+            private HashMap<Integer, Double> superRegionScores = new HashMap<Integer, Double>();
+
+            private double score(Region r) {
+                if (!superRegionScores.containsKey(r.getSuperRegion().getId())) {
+                    superRegionScores.put(r.getSuperRegion().getId(), r.getSuperRegion().score(state));
+//                    System.err.println("Region "+r.getId()+" is in super region that scores "+r.getSuperRegion().score(state));
+                }
+                double score = 0;
+                if (!state.getMyPlayerName().equals(r.getSuperRegion().ownedByPlayer())) {
+                    score += 100*superRegionScores.get(r.getSuperRegion().getId());
+                }
+                if (r.isBorderTo(state.getOpponentPlayerName())) {
+                    score += 10;
+                }
+                if (r.isBorder()) {
+                    score += 1;
+                }
+
+                return score;
+            }
+
+            @Override
+            public int compare(Region o1, Region o2) {
+                return Double.compare(score(o2), score(o1));
+            }
+        });
+
+		while(armiesLeft > 0) {
+			Region region = visibleRegions.remove(0);
+			if(region.ownedByPlayer(myName)) {
+//                System.err.println("Region "+region.getId()+" is in super region that scores "+region.getSuperRegion().score(state));
 				placeArmiesMoves.add(new PlaceArmiesMove(myName, region, armies));
 				armiesLeft -= armies;
 			}

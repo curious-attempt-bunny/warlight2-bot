@@ -21,6 +21,10 @@ public class IntegrationTest extends TestCase {
         testCase("AttackToWinSuperRegion2.txt");
     }
 
+    public void testPlaceArmiesInHighestPriorityRegions() throws Exception {
+        testCase("PlaceArmiesInHighestPriorityRegions.txt");
+    }
+
     private void testCase(String filename) throws Exception {
         String input = readFileAsString(filename);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -55,12 +59,16 @@ public class IntegrationTest extends TestCase {
     }
 
     private boolean matches(String expected, String actual) {
-        if (expected.equals(actual)) {
-            return true;
+        if (expected.startsWith("!")) {
+            return !matches(expected.substring(1), actual);
         }
+
         if (expected.startsWith("[")) {
             return actual.contains(expected.substring(1, expected.length()-1));
+        } else if (actual.contains(expected)) {
+            return true;
         }
+
         return false;
     }
 

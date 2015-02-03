@@ -143,4 +143,13 @@ public class Region {
     public int getLayerNumber() {
         return layerNumber;
     }
+
+    public boolean isBorderTo(String playerName) {
+        for(Region region : neighbors) {
+            if (playerName.equals(region.getPlayerName())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

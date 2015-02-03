@@ -9,6 +9,8 @@
  */
 
 package map;
+import bot.BotState;
+
 import java.util.LinkedList;
 
 public class SuperRegion {
@@ -75,5 +77,35 @@ public class SuperRegion {
         }
 
         return countNotOwned;
+    }
+
+    public double score(BotState state) {
+        int armies = 0;
+        for(Region region2 : subRegions) {
+            Region region = (state.getVisibleMap() == null ? null : state.getVisibleMap().getRegion(region2.getId()));
+            if (region == null) {
+                boolean isWasteland = false;
+                for(Region wasteland : state.getWasteLands()) {
+                    if (wasteland.getId() == region2.getId()) {
+                        isWasteland = true;
+                        break;
+                    }
+                }
+                if (isWasteland) {
+                    armies += 10;
+                } else {
+                    armies += 2;
+                }
+            } else if (!region2.getPlayerName().equals(state.getMyPlayerName())) {
+//                System.err.println("Region "+region2.getId()+" has armies "+region2.getArmies());
+                armies += region2.getArmies();
+            }
+        }
+
+        double score = armies == 0 ? armiesReward : (double)armiesReward / armies;
+
+//        System.err.println("Super region "+id+" has total armies "+armies+" bonus "+armiesReward+" so score is "+score);
+
+        return score;
     }
 }

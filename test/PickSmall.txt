@@ -23,5 +23,5 @@ settings starting_regions 6 8 9 12 16
 
 pick_starting_region 10000 6 8 9 12 16
 
-# Valid: 8
-# Valid: 9
+# This is the best starting point
+# Valid: 16

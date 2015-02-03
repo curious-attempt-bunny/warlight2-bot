@@ -60,9 +60,9 @@ public class BotParser {
 
                     // we are updating the state, but that should be fine because it will be overwritten in the next round
                     for(PlaceArmiesMove move : placeArmiesMoves) {
-                        if (move.getRegion().getId() == 10) System.err.println("Placing at "+move.getRegion().getId()+": "+move.getRegion().getArmies()+" -> "+(move.getRegion().getArmies()+move.getArmies()));
+//                        if (move.getRegion().getId() == 10) System.err.println("Placing at "+move.getRegion().getId()+": "+move.getRegion().getArmies()+" -> "+(move.getRegion().getArmies()+move.getArmies()));
                         move.getRegion().setArmies(move.getRegion().getArmies() + move.getArmies());
-                        if (move.getRegion().getId() == 10) System.err.println("Updated region "+move.getRegion().getId()+" armies = "+move.getRegion().getArmies());
+//                        if (move.getRegion().getId() == 10) System.err.println("Updated region "+move.getRegion().getId()+" armies = "+move.getRegion().getArmies());
                     }
 				} 
 				else if(parts[1].equals("attack/transfer")) 
@@ -84,10 +84,10 @@ public class BotParser {
 //                  Output from your bot: "player1 place_armies 7 2,player1 place_armies 7 2,player1 place_armies 9 2,"
 
                     for(PlaceArmiesMove move : placeArmiesMoves) {
-                        if (move.getRegion().getId() == 10) System.err.println("Replacing at "+move.getRegion()+": "+move.getRegion().getArmies()+" -> "+(move.getRegion().getArmies()-move.getArmies()));
+//                        if (move.getRegion().getId() == 10) System.err.println("Replacing at "+move.getRegion()+": "+move.getRegion().getArmies()+" -> "+(move.getRegion().getArmies()-move.getArmies()));
 
                         move.getRegion().setArmies(move.getRegion().getArmies() - move.getArmies());
-                        if (move.getRegion().getId() == 10) System.err.println("Updated region "+move.getRegion().getId()+" armies = "+move.getRegion().getArmies());
+//                        if (move.getRegion().getId() == 10) System.err.println("Updated region "+move.getRegion().getId()+" armies = "+move.getRegion().getArmies());
                     }
 
                     for(int i=2; i<parts.length; i+=3) {
@@ -97,11 +97,11 @@ public class BotParser {
 
                         Region region1 = currentState.getVisibleMap().getRegion(region);
 
-                        if (region == 10) System.err.println("Correcting placing at "+region1+": "+region1.getArmies()+" -> "+(region1.getArmies()+armies));
+//                        if (region == 10) System.err.println("Correcting placing at "+region1+": "+region1.getArmies()+" -> "+(region1.getArmies()+armies));
 
                         region1.setArmies(region1.getArmies()+armies);
 
-                        if (region == 10) System.err.println("Updated region "+region1.getId()+" armies = "+region1.getArmies());
+//                        if (region == 10) System.err.println("Updated region "+region1.getId()+" armies = "+region1.getArmies());
                     }
                 }
 			} else if(parts[0].equals("settings")) {
